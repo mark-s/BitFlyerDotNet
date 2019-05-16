@@ -7,14 +7,15 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BitFlyerDotNet.LightningApi;
+using BitFlyerClient = BitFlyerDotNet.LightningApi.Public.BitFlyerClient;
 
 namespace PublicApiTests
 {
     [TestClass]
     public class UnitTest1
     {
-        const BfProductCode ProductCode = BfProductCode.FXBTCJPY;
-        BitFlyerClient _client;
+        private const BfProductCode ProductCode = BfProductCode.FXBTCJPY;
+        private BitFlyerClient _client;
 
         [TestInitialize]
         public void Initialize()
@@ -46,16 +47,7 @@ namespace PublicApiTests
             Console.WriteLine("Health:{0} State:{1}", boardState.Health, boardState.State);
         }
 
-        [TestMethod]
-        public void GetChats()
-        {
-            // Until 5 minutes before
-            var resp = _client.GetChats(DateTime.UtcNow - TimeSpan.FromMinutes(5));
-            Assert.IsFalse(resp.IsErrorOrEmpty);
 
-            var chats = resp.GetResult();
-            chats.ForEach(chat => { Console.WriteLine("{0} {1} {2}", chat.Nickname, chat.Message, chat.Date.ToLocalTime()); });
-        }
 
         [TestMethod]
         public void GetExchangeHealth()

@@ -9,22 +9,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebSocket4Net;
 
-namespace BitFlyerDotNet.LightningApi
+namespace BitFlyerDotNet.LightningApi.Realtime
 {
-    internal interface IRealtimeSource
-    {
-        string Channel { get; }
-        void OnSubscribe(JToken token);
-        void Subscribe();
-    }
-
     internal abstract class RealtimeSourceBase<TSource> : IRealtimeSource, IObservable<TSource> where TSource : class
     {
-        WebSocket _webSocket;
-        JsonSerializerSettings _jsonSettings;
+        private readonly WebSocket _webSocket;
+        private readonly JsonSerializerSettings _jsonSettings;
 
         public string Channel { get; private set; }
-        IObserver<TSource> _observer;
+        private IObserver<TSource> _observer;
 
         public RealtimeSourceBase(WebSocket webSocket, string channelFormat, JsonSerializerSettings jsonSettings, string productCode)
         {
@@ -52,7 +45,7 @@ namespace BitFlyerDotNet.LightningApi
             return Disposable.Create(OnDispose);
         }
 
-        void OnDispose()
+        private void OnDispose()
         {
             if (_webSocket != null)
             {

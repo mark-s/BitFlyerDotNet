@@ -3,15 +3,16 @@
 // https://www.fiats.asia/
 //
 
+using BitFlyerDotNet.LightningApi.Public;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebSocket4Net;
 
-namespace BitFlyerDotNet.LightningApi
+namespace BitFlyerDotNet.LightningApi.Realtime
 {
     internal sealed class RealtimeBoardSource : RealtimeSourceBase<BfBoard>
     {
-        const string ChannelFormat = "lightning_board_{0}";
+        private const string ChannelFormat = "lightning_board_{0}";
 
         public RealtimeBoardSource(WebSocket webSocket, JsonSerializerSettings jsonSettings, string productCode)
             : base(webSocket, ChannelFormat, jsonSettings, productCode)

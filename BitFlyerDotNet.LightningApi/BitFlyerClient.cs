@@ -14,171 +14,32 @@ using Newtonsoft.Json;
 
 namespace BitFlyerDotNet.LightningApi
 {
-    public class BfErrorResponse
+
+
+    public abstract class BitFlyerClientBase : IDisposable
     {
-        [JsonProperty(PropertyName = "status")]
-        public int Status { get; private set; }
 
-        [JsonProperty(PropertyName = "error_message")]
-        public string ErrorMessage { get; private set; }
 
-        [JsonProperty(PropertyName = "data")]
-        public string Data { get; private set; }
+        private const string _baseUri = "https://api.bitflyer.jp";
+        private const string _publicBasePath = "/v1/";
+        private const string _privateBasePath = "/v1/me/";
+        protected const string _usaMarket = "/usa";
+        protected const string _euMarket = "/eu";
 
-        public static readonly BfErrorResponse Default = default(BfErrorResponse);
-    }
-
-    public interface IBitFlyerResponse
-    {
-        string Json { get; }
-        bool IsError { get; }
-        bool IsNetworkError { get; }
-        bool IsApplicationError { get; }
-        string ErrorMessage { get; }
-        bool IsUnauthorized { get; }
-    }
-
-    public class BitFlyerResponse : IBitFlyerResponse
-    {
-        public static readonly IBitFlyerResponse Success = new BitFlyerResponse(false, false, "Success");
-
-        public string Json { get; }
-        public bool IsError { get { return IsNetworkError || IsApplicationError; } }
-        public bool IsNetworkError { get; private set; }
-        public bool IsApplicationError { get; private set; }
-        public bool IsUnauthorized { get { return false; } }
-        public string ErrorMessage { get; private set; }
-
-        public BitFlyerResponse(bool isNetworkError, bool isApplicationError, string errorMessage)
-        {
-            IsNetworkError = isNetworkError;
-            IsApplicationError = isApplicationError;
-            ErrorMessage = errorMessage;
-        }
-    }
-
-    public class BitFlyerResponse<T> : IBitFlyerResponse
-    {
-        string JsonEmpty
-        {
-            get
-            {
-                if (typeof(T) != typeof(string) && typeof(T).IsArray)
-                {
-                    return "[]";
-                }
-                else
-                {
-                    return "{}";
-                }
-            }
-        }
-
-        static readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
-        {
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc
-        };
-
-        internal void ParseResponseMessage(string request, HttpResponseMessage message)
-        {
-            StatusCode = message.StatusCode;
-            Json = message.Content.ReadAsStringAsync().Result;
-        }
-
-        public HttpStatusCode StatusCode { get; internal set; }
-        public BfErrorResponse ErrorResponse { get; internal set; } = BfErrorResponse.Default;
-        public bool IsUnauthorized { get { return StatusCode == HttpStatusCode.Unauthorized; } }
-
-        string _errorMessage;
-        public string ErrorMessage
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(_errorMessage))
-                {
-                    return _errorMessage;
-                }
-                else if (StatusCode != HttpStatusCode.OK)
-                {
-                    return StatusCode.ToString();
-                }
-                else
-                {
-                    return ErrorResponse != BfErrorResponse.Default ? ErrorResponse.ErrorMessage : "Success";
-                }
-            }
-            set { _errorMessage = value; }
-        }
-
-        public bool IsNetworkError { get { return StatusCode != HttpStatusCode.OK; } }
-        public bool IsApplicationError { get { return ErrorResponse != BfErrorResponse.Default; } }
-        public bool IsError { get { return StatusCode != HttpStatusCode.OK || ErrorResponse != BfErrorResponse.Default; } }
-        public bool IsEmpty { get { return string.IsNullOrEmpty(_json) || _json == JsonEmpty; } }
-        public bool IsErrorOrEmpty { get { return IsError || IsEmpty; } }
-        public Exception Exception { get; internal set; }
-
-        T _result = default(T);
-        public T GetResult()
-        {
-            if (object.Equals(_result, default(T)))
-            {
-                _result = JsonConvert.DeserializeObject<T>(_json, _jsonSettings);
-            }
-            return _result;
-        }
-
-        string _json;
-        public string Json
-        {
-            get { return _json; }
-            set
-            {
-                if (value.Contains("error_message"))
-                {
-                    ErrorResponse = JsonConvert.DeserializeObject<BfErrorResponse>(value, _jsonSettings);
-                }
-                else
-                {
-                    _json = value;
-                }
-            }
-        }
-
-        public BitFlyerResponse()
-        {
-            _json = JsonEmpty;
-        }
-    }
-
-    public partial class BitFlyerClient : IDisposable
-    {
-        static readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
-        {
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc
-        };
-
-        const string _baseUri = "https://api.bitflyer.jp";
-        const string _publicBasePath = "/v1/";
-        const string _privateBasePath = "/v1/me/";
-        const string _usaMarket = "/usa";
-        const string _euMarket = "/eu";
-
-        HttpClient _client;
-        string _apiKey;
-        HMACSHA256 _hmac;
+        private readonly HttpClient _client;
+        private readonly string _apiKey;
+        private readonly HMACSHA256 _hmac;
 
         public bool IsPrivateApiEnabled { get { return _hmac != null; } }
 
-        public BitFlyerClient()
+        public BitFlyerClientBase()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             _client = new HttpClient();
             _client.BaseAddress = new Uri(_baseUri);
         }
 
-        public BitFlyerClient(string apiKey, string apiSecret)
+        public BitFlyerClientBase(string apiKey, string apiSecret)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
             _apiKey = apiKey;
@@ -193,7 +54,7 @@ namespace BitFlyerDotNet.LightningApi
             _hmac.Dispose();
         }
 
-        internal BitFlyerResponse<T> Get<T>(string apiName, string queryParameters = "")
+        public BitFlyerResponse<T> Get<T>(string apiName, string queryParameters = "")
         {
             var path = _publicBasePath + apiName.ToLower();
             if (!string.IsNullOrEmpty(queryParameters))

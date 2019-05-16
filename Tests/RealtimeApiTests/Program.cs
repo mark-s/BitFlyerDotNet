@@ -8,9 +8,9 @@ using BitFlyerDotNet.LightningApi;
 
 namespace RealtimeApiTests
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var factory = new RealtimeSourceFactory();
             //var disp = SubscribeTickerSource(factory, BfProductCode.BTCUSD);
@@ -19,7 +19,7 @@ namespace RealtimeApiTests
             disp.Dispose();
         }
 
-        static IDisposable SubscribeTickerSource(RealtimeSourceFactory factory, BfProductCode productCode)
+        private static IDisposable SubscribeTickerSource(RealtimeSourceFactory factory, BfProductCode productCode)
         {
             var source = factory.GetTickerSource(productCode);
             return source.Subscribe(ticker =>
@@ -29,7 +29,7 @@ namespace RealtimeApiTests
 
         }
 
-        static IDisposable SubscribeExecutionSource(RealtimeSourceFactory factory, BfProductCode productCode)
+        private static IDisposable SubscribeExecutionSource(RealtimeSourceFactory factory, BfProductCode productCode)
         {
             var source = factory.GetExecutionSource(productCode);
             return source.Subscribe(exec =>

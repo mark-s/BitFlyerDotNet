@@ -14,38 +14,35 @@ using System.Net.Sockets;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using BitFlyerDotNet.LightningApi.Public;
+using BitFlyerDotNet.LightningApi.Realtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebSocket4Net;
-using Fiats.Utils;
 
 namespace BitFlyerDotNet.LightningApi
 {
-    public class RealtimeSourceFactory : IDisposable
+    public partial class RealtimeSourceFactory : IDisposable
     {
-        public class ErrorStatus
-        {
-            public SocketError SocketError { get; set; } = SocketError.Success;
-            public string Message { get; set; }
-        }
         public delegate void RealtimeErrorHandler(ErrorStatus error);
         public RealtimeErrorHandler ErrorHandlers;
 
-        CompositeDisposable _disposables = new CompositeDisposable();
-        WebSocket _webSocket;
-        AutoResetEvent _openedEvent = new AutoResetEvent(false);
-        JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        private readonly WebSocket _webSocket;
+        private readonly AutoResetEvent _openedEvent = new AutoResetEvent(false);
+
+        private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
         {
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             DateTimeZoneHandling = DateTimeZoneHandling.Utc
         };
 
-        ConcurrentDictionary<string, IRealtimeSource> _webSocketSources = new ConcurrentDictionary<string, IRealtimeSource>();
-        Timer _wsReconnectionTimer;
-        const int WebSocketReconnectionIntervalMs = 5000;
+        private readonly ConcurrentDictionary<string, IRealtimeSource> _webSocketSources = new ConcurrentDictionary<string, IRealtimeSource>();
+        private readonly Timer _wsReconnectionTimer;
+        private const int WebSocketReconnectionIntervalMs = 5000;
 
-        BitFlyerClient _client = new BitFlyerClient();
-        Dictionary<string, string> _productCodeAliases = new Dictionary<string, string>();
+        private readonly Public.BitFlyerClient _client = new Public.BitFlyerClient();
+        private readonly Dictionary<string, string> _productCodeAliases = new Dictionary<string, string>();
 
         public RealtimeSourceFactory()
         {
@@ -139,8 +136,9 @@ namespace BitFlyerDotNet.LightningApi
             };
         }
 
-        bool _opened = false;
-        void TryOpen()
+        private bool _opened = false;
+
+        private void TryOpen()
         {
             if (!_opened)
             {
@@ -150,7 +148,7 @@ namespace BitFlyerDotNet.LightningApi
             }
         }
 
-        void InitProductCodeAliases()
+        private void InitProductCodeAliases()
         {
             if (_productCodeAliases.Count > 0)
             {
@@ -191,7 +189,7 @@ namespace BitFlyerDotNet.LightningApi
             _disposables.Dispose();
         }
 
-        ConcurrentDictionary<BfProductCode, IConnectableObservable<BfExecution>> _executionColdSources = new ConcurrentDictionary<BfProductCode, IConnectableObservable<BfExecution>>();
+        private readonly ConcurrentDictionary<BfProductCode, IConnectableObservable<BfExecution>> _executionColdSources = new ConcurrentDictionary<BfProductCode, IConnectableObservable<BfExecution>>();
         public IObservable<BfExecution> GetExecutionSource(BfProductCode productCode, bool coldStart = false)
         {
             TryOpen();
@@ -223,7 +221,7 @@ namespace BitFlyerDotNet.LightningApi
             }
         }
 
-        ConcurrentDictionary<BfProductCode, IObservable<BfTicker>> _tickSources = new ConcurrentDictionary<BfProductCode, IObservable<BfTicker>>();
+        private readonly ConcurrentDictionary<BfProductCode, IObservable<BfTicker>> _tickSources = new ConcurrentDictionary<BfProductCode, IObservable<BfTicker>>();
         public IObservable<BfTicker> GetTickerSource(BfProductCode productCode)
         {
             TryOpen();
@@ -237,7 +235,7 @@ namespace BitFlyerDotNet.LightningApi
             });
         }
 
-        ConcurrentDictionary<BfProductCode, IObservable<BfBoard>> _boardSources = new ConcurrentDictionary<BfProductCode, IObservable<BfBoard>>();
+        private readonly ConcurrentDictionary<BfProductCode, IObservable<BfBoard>> _boardSources = new ConcurrentDictionary<BfProductCode, IObservable<BfBoard>>();
         public IObservable<BfBoard> GetBoardSource(BfProductCode productCode)
         {
             TryOpen();
@@ -251,7 +249,7 @@ namespace BitFlyerDotNet.LightningApi
             });
         }
 
-        ConcurrentDictionary<BfProductCode, IObservable<BfBoard>> _boardSnapshotSources = new ConcurrentDictionary<BfProductCode, IObservable<BfBoard>>();
+        private readonly ConcurrentDictionary<BfProductCode, IObservable<BfBoard>> _boardSnapshotSources = new ConcurrentDictionary<BfProductCode, IObservable<BfBoard>>();
         public IObservable<BfBoard> GetBoardSnapshotSource(BfProductCode productCode)
         {
             TryOpen();

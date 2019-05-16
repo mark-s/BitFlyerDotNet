@@ -3,11 +3,11 @@ using BitFlyerDotNet.LightningApi;
 
 namespace RealTimeApiSample
 {
-    class Program
+    internal class Program
     {
-        static char GetCh(bool echo = true) { var ch = Char.ToUpper(Console.ReadKey(true).KeyChar); if (echo) Console.WriteLine(ch); return ch; }
+        private static char GetCh(bool echo = true) { var ch = Char.ToUpper(Console.ReadKey(true).KeyChar); if (echo) Console.WriteLine(ch); return ch; }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var factory = new RealtimeSourceFactory();
             factory.ErrorHandlers += (error) =>
@@ -32,11 +32,11 @@ namespace RealTimeApiSample
             Console.ReadLine();
         }
 
-        static void RealtimeExecutionSample(RealtimeSourceFactory factory)
+        private static void RealtimeExecutionSample(RealtimeSourceFactory factory)
         {
-            factory.GetExecutionSource(BfProductCode.FXBTCJPY).Subscribe(tick =>
+            factory.GetExecutionSource(BfProductCode.BTCJPY).Subscribe(tick =>
             {
-                Console.WriteLine("{0} {1} {2} {3} {4} {5}",
+                Console.WriteLine(BfProductCode.BTCJPY + " {0} {1} {2} {3} {4} {5}",
                     tick.ExecutionId,
                     tick.Side,
                     tick.Price,
@@ -46,23 +46,11 @@ namespace RealTimeApiSample
             });
         }
 
-        static void RealtimeTickerSample(RealtimeSourceFactory factory)
+        private static void RealtimeTickerSample(RealtimeSourceFactory factory)
         {
-            factory.GetTickerSource(BfProductCode.FXBTCJPY).Subscribe(ticker =>
+            factory.GetTickerSource(BfProductCode.BTCJPY).Subscribe(ticker =>
             {
-                Console.WriteLine("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11}",
-                    ticker.ProductCode,
-                    ticker.Timestamp.ToLocalTime(),
-                    ticker.TickId,
-                    ticker.BestBid,
-                    ticker.BestAsk,
-                    ticker.BestBidSize,
-                    ticker.BestAskSize,
-                    ticker.TotalBidDepth,
-                    ticker.TotalAskDepth,
-                    ticker.LastTradedPrice,
-                    ticker.Last24HoursVolume,
-                    ticker.VolumeByProduct);
+                Console.WriteLine($"{ticker.ProductCode} {ticker.Timestamp.ToLocalTime()} {ticker.BestBid} {ticker.BestAsk} {ticker.LastTradedPrice}");
             });
         }
     }
