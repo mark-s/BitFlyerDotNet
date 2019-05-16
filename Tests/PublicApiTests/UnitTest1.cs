@@ -7,7 +7,8 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BitFlyerDotNet.LightningApi;
-using BitFlyerClient = BitFlyerDotNet.LightningApi.Public.BitFlyerClient;
+using BitFlyerDotNet.LightningApi.Public;
+
 
 namespace PublicApiTests
 {
