@@ -20,15 +20,12 @@ namespace BitFlyerDotNet.LightningApi
 
         private const string _baseUri = "https://api.bitflyer.jp";
         private const string _publicBasePath = "/v1/";
-        private const string _privateBasePath = "/v1/me/";
-        protected const string _usaMarket = "/usa";
-        protected const string _euMarket = "/eu";
+
 
         private readonly HttpClient _client;
         private readonly string _apiKey;
         private readonly HMACSHA256 _hmac;
 
-        public bool IsPrivateApiEnabled { get { return _hmac != null; } }
 
         public BitFlyerClientBase()
         {
@@ -87,8 +84,7 @@ namespace BitFlyerDotNet.LightningApi
                     else if (ex is WebException)
                     {
                         var we = ex.InnerException as WebException;
-                        var resp = we.Response as HttpWebResponse;
-                        if (resp != null)
+                        if (we?.Response is HttpWebResponse resp)
                         {
                             response.StatusCode = resp.StatusCode;
                         }

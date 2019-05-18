@@ -2,7 +2,7 @@
 
 namespace BitFlyerDotNet.LightningApi
 {
-    public enum BfProductCode
+    public enum ProductCode
     {
         [EnumMember(Value = "")]
         Unknown,

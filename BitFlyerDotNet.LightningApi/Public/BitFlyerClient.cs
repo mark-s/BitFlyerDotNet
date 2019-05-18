@@ -2,16 +2,17 @@
 {
     public class BitFlyerClient : BitFlyerClientBase
     {
-        public BitFlyerResponse<BfBoard> GetBoard(BfProductCode productCode)
-            => Get<BfBoard>(nameof(GetBoard), "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfBoardStateResult> GetBoardState(BfProductCode productCode) 
-            => Get<BfBoardStateResult>(nameof(GetBoardState), "product_code=" + productCode.ToEnumString());
+        public BitFlyerResponse<BfBoard> GetBoard(ProductCode productCode)
+            => Get<BfBoard>(ApiName.GetBoard, "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfExchangeHealth> GetExchangeHealth(BfProductCode productCode) 
-            => Get<BfExchangeHealth>("gethealth", "product_code=" + productCode.ToEnumString());
+        public BitFlyerResponse<BfBoardStateResult> GetBoardState(ProductCode productCode)
+            => Get<BfBoardStateResult>(ApiName.GetBoardState, "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfExecution[]> GetExecutions(BfProductCode productCode, int count = 0, int before = 0, int after = 0)
+        public BitFlyerResponse<BfExchangeHealth> GetExchangeHealth(ProductCode productCode)
+            => Get<BfExchangeHealth>(ApiName.GetExchangeHealth, "product_code=" + productCode.ToEnumString());
+
+        public BitFlyerResponse<BfExecution[]> GetExecutions(ProductCode productCode, int count = 0, int before = 0, int after = 0)
         {
             var query = string.Format("product_code={0}{1}{2}{3}",
                 productCode.ToEnumString(),
@@ -19,29 +20,29 @@
                 (before > 0) ? $"&before={before}" : "",
                 (after > 0) ? $"&after={after}" : ""
             );
-            return Get<BfExecution[]>(nameof(GetExecutions), query);
+            return Get<BfExecution[]>(ApiName.GetExecutions, query);
         }
 
-        public BitFlyerResponse<BfMarket[]> GetMarkets() 
-            => Get<BfMarket[]>(nameof(GetMarkets));
+        public BitFlyerResponse<BfMarket[]> GetMarketsJp()
+            => Get<BfMarket[]>(ApiName.GetMarketsJP);
 
-        public BitFlyerResponse<BfMarket[]> GetMarketsUsa() 
-            => Get<BfMarket[]>(nameof(GetMarkets) + _usaMarket);
+        public BitFlyerResponse<BfMarket[]> GetMarketsUsa()
+            => Get<BfMarket[]>(ApiName.GetMarketsUSA);
 
-        public BitFlyerResponse<BfMarket[]> GetMarketsEu() 
-            => Get<BfMarket[]>(nameof(GetMarkets) + _euMarket);
+        public BitFlyerResponse<BfMarket[]> GetMarketsEu()
+            => Get<BfMarket[]>(ApiName.GetMarketsEU);
 
-        public BitFlyerResponse<BfMarket[]>[] GetMarketsAll()
+        public BitFlyerResponse<BfMarket[]>[] GetAllMarkets()
         {
             return new[]
             {
-                GetMarkets(),
+                GetMarketsJp(),
                 GetMarketsUsa(),
                 GetMarketsEu()
             };
         }
 
-        public BitFlyerResponse<BfTicker> GetTicker(BfProductCode productCode) 
-            => Get<BfTicker>(nameof(GetTicker), "product_code=" + productCode.ToEnumString());
+        public BitFlyerResponse<BfTicker> GetTicker(ProductCode productCode)
+            => Get<BfTicker>(ApiName.GetTicker, "product_code=" + productCode.ToEnumString());
     }
 }

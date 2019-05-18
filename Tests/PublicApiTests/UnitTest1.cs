@@ -15,7 +15,7 @@ namespace PublicApiTests
     [TestClass]
     public class UnitTest1
     {
-        private const BfProductCode ProductCode = BfProductCode.FXBTCJPY;
+        private const ProductCode ProductCode = BitFlyerDotNet.LightningApi.ProductCode.FXBTCJPY;
         private BitFlyerClient _client;
 
         [TestInitialize]
@@ -84,7 +84,7 @@ namespace PublicApiTests
         public void GetMarkets()
         {
             {
-                var resp = _client.GetMarkets();
+                var resp = _client.GetMarketsJp();
                 Assert.IsFalse(resp.IsErrorOrEmpty);
 
                 var markets = resp.GetResult();
@@ -109,7 +109,7 @@ namespace PublicApiTests
         [TestMethod]
         public void GetTicker()
         {
-            var resp = _client.GetTicker(BfProductCode.BTCJPYMAT3M);
+            var resp = _client.GetTicker(ProductCode.BTCJPYMAT3M);
             Assert.IsFalse(resp.IsErrorOrEmpty);
 
             var ticker = resp.GetResult();
