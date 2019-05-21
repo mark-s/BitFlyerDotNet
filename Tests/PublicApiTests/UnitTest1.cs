@@ -1,14 +1,15 @@
-//==============================================================================
+﻿//==============================================================================
 // Copyright (c) 2017-2018 Fiats Inc. All rights reserved.
 // http://www.fiats.asia/
 //
 
 using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using BitFlyerDotNet.LightningApi;
 using BitFlyerDotNet.LightningApi.Public;
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PublicApiTests
 {
@@ -27,7 +28,7 @@ namespace PublicApiTests
         [TestMethod]
         public void GetBoard()
         {
-            var resp = _client.GetBoard(ProductCode);
+            var resp = _client.GetBoardAsync(ProductCode);
             Assert.IsFalse(resp.IsErrorOrEmpty);
 
             var board = resp.GetResult();
@@ -41,7 +42,7 @@ namespace PublicApiTests
         [TestMethod]
         public void GetBoardState()
         {
-            var resp = _client.GetBoardState(ProductCode);
+            var resp = _client.GetBoardStateAsync(ProductCode);
             Assert.IsFalse(resp.IsErrorOrEmpty);
 
             var boardState = resp.GetResult();
@@ -53,7 +54,7 @@ namespace PublicApiTests
         [TestMethod]
         public void GetExchangeHealth()
         {
-            var resp = _client.GetExchangeHealth(ProductCode);
+            var resp = _client.GetExchangeHealthAsync(ProductCode);
             Assert.IsFalse(resp.IsErrorOrEmpty);
 
             var health = resp.GetResult();
@@ -63,7 +64,7 @@ namespace PublicApiTests
         [TestMethod]
         public void GetExecutions()
         {
-            var resp = _client.GetExecutions(ProductCode);
+            var resp = _client.GetExecutionsAsync(ProductCode);
             Assert.IsFalse(resp.IsErrorOrEmpty);
 
             var execs = resp.GetResult();
@@ -84,21 +85,21 @@ namespace PublicApiTests
         public void GetMarkets()
         {
             {
-                var resp = _client.GetMarketsJp();
+                var resp = _client.GetMarketsJpAsync();
                 Assert.IsFalse(resp.IsErrorOrEmpty);
 
                 var markets = resp.GetResult();
                 markets.ForEach(market => { Console.WriteLine("{0} {1}", market.ProductCode, market.Alias); });
             }
             {
-                var resp = _client.GetMarketsUsa();
+                var resp = _client.GetMarketsUsaAsync();
                 Assert.IsFalse(resp.IsErrorOrEmpty);
 
                 var markets = resp.GetResult();
                 markets.ForEach(market => { Console.WriteLine("{0} {1}", market.ProductCode, market.Alias); });
             }
             {
-                var resp = _client.GetMarketsEu();
+                var resp = _client.GetMarketsEuAsync();
                 Assert.IsFalse(resp.IsErrorOrEmpty);
 
                 var markets = resp.GetResult();

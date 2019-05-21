@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using BitFlyerDotNet.LightningApi.DTOs;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace BitFlyerDotNet.LightningApi.Public
@@ -7,6 +9,6 @@ namespace BitFlyerDotNet.LightningApi.Public
     {
         [JsonProperty(PropertyName = "status")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public BfBoardHealth Status { get; private set; }
+        public BoardHealth Status { get; private set; }
     }
 }

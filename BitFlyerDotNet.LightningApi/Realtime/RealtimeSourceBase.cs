@@ -5,8 +5,10 @@
 
 using System;
 using System.Reactive.Disposables;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using WebSocket4Net;
 
 namespace BitFlyerDotNet.LightningApi.Realtime

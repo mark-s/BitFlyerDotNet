@@ -4,6 +4,7 @@
 //
 
 using System;
+
 using BitFlyerDotNet.LightningApi;
 
 namespace RealtimeApiTests

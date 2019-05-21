@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 using BitFlyerDotNet.LightningApi;
+using BitFlyerDotNet.LightningApi.Domain;
 
 namespace RealTimeApiSample
 {
     internal class Program
     {
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var factory = new RealtimeSourceFactory();
             factory.ErrorHandlers += (error) =>
@@ -15,7 +18,7 @@ namespace RealTimeApiSample
             };
 
 
-            RealtimeTickerSample(factory);
+             await RealtimeTickerSample(factory);
 
 
             Console.ReadLine();
@@ -23,9 +26,11 @@ namespace RealTimeApiSample
 
 
 
-        private static void RealtimeTickerSample(RealtimeSourceFactory factory)
+        private static async Task RealtimeTickerSample(RealtimeSourceFactory factory)
         {
-            factory.GetTickerSource(ProductCode.BTCJPY).Subscribe(ticker =>
+            var tickerSource = await factory.GetTickerSource(ProductCode.BTCJPY);
+
+            tickerSource.Subscribe(ticker =>
             {
                 Console.WriteLine($"{ticker.ProductCode} {ticker.Timestamp.ToLocalTime()} {ticker.BestBid} {ticker.BestAsk} {ticker.LastTradedPrice}");
             });

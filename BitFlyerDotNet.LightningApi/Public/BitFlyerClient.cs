@@ -1,48 +1,51 @@
-﻿namespace BitFlyerDotNet.LightningApi.Public
+﻿using System.Threading.Tasks;
+
+using BitFlyerDotNet.LightningApi.Domain;
+
+namespace BitFlyerDotNet.LightningApi.Public
 {
     public class BitFlyerClient : BitFlyerClientBase
     {
 
-        public BitFlyerResponse<BfBoard> GetBoard(ProductCode productCode)
-            => Get<BfBoard>(ApiName.GetBoard, "product_code=" + productCode.ToEnumString());
+        public async Task<BitFlyerResponse<BfBoard>> GetBoardAsync(ProductCode productCode)
+            => await GetAsync<BfBoard>(ApiName.GetBoard, "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfBoardStateResult> GetBoardState(ProductCode productCode)
-            => Get<BfBoardStateResult>(ApiName.GetBoardState, "product_code=" + productCode.ToEnumString());
+        public async Task<BitFlyerResponse<BfBoardStateResult>> GetBoardStateAsync(ProductCode productCode)
+            => await GetAsync<BfBoardStateResult>(ApiName.GetBoardState, "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfExchangeHealth> GetExchangeHealth(ProductCode productCode)
-            => Get<BfExchangeHealth>(ApiName.GetExchangeHealth, "product_code=" + productCode.ToEnumString());
+        public async Task<BitFlyerResponse<BfExchangeHealth>> GetExchangeHealthAsync(ProductCode productCode)
+            => await GetAsync<BfExchangeHealth>(ApiName.GetExchangeHealth, "product_code=" + productCode.ToEnumString());
 
-        public BitFlyerResponse<BfExecution[]> GetExecutions(ProductCode productCode, int count = 0, int before = 0, int after = 0)
+        public async Task<BitFlyerResponse<BfMarket[]>> GetMarketsJpAsync()
+            => await GetAsync<BfMarket[]>(ApiName.GetMarketsJP);
+
+        public async Task<BitFlyerResponse<BfMarket[]>> GetMarketsUsaAsync()
+            => await GetAsync<BfMarket[]>(ApiName.GetMarketsUSA);
+
+        public async Task<BitFlyerResponse<BfMarket[]>> GetMarketsEuAsync()
+            => await GetAsync<BfMarket[]>(ApiName.GetMarketsEU);
+
+        public async Task<BitFlyerResponse<BfTicker>> GetTicker(ProductCode productCode)
+            => await GetAsync<BfTicker>(ApiName.GetTicker, "product_code=" + productCode.ToEnumString());
+
+        public async Task<BitFlyerResponse<BfMarket[]>[]> GetAllMarketsAsync()
         {
-            var query = string.Format("product_code={0}{1}{2}{3}",
-                productCode.ToEnumString(),
-                (count > 0) ? $"&count={count}" : "",
-                (before > 0) ? $"&before={before}" : "",
-                (after > 0) ? $"&after={after}" : ""
-            );
-            return Get<BfExecution[]>(ApiName.GetExecutions, query);
-        }
+            var jpAsync = GetMarketsJpAsync();
+            var usaAsync = GetMarketsUsaAsync();
+            var euAsync = GetMarketsEuAsync();
 
-        public BitFlyerResponse<BfMarket[]> GetMarketsJp()
-            => Get<BfMarket[]>(ApiName.GetMarketsJP);
+            await Task.WhenAll(jpAsync, usaAsync, euAsync);
 
-        public BitFlyerResponse<BfMarket[]> GetMarketsUsa()
-            => Get<BfMarket[]>(ApiName.GetMarketsUSA);
-
-        public BitFlyerResponse<BfMarket[]> GetMarketsEu()
-            => Get<BfMarket[]>(ApiName.GetMarketsEU);
-
-        public BitFlyerResponse<BfMarket[]>[] GetAllMarkets()
-        {
             return new[]
             {
-                GetMarketsJp(),
-                GetMarketsUsa(),
-                GetMarketsEu()
+                jpAsync.Result,
+                usaAsync.Result,
+                euAsync.Result,
             };
+
         }
 
-        public BitFlyerResponse<BfTicker> GetTicker(ProductCode productCode)
-            => Get<BfTicker>(ApiName.GetTicker, "product_code=" + productCode.ToEnumString());
+        
+
     }
 }

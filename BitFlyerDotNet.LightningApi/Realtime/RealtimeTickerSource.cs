@@ -4,8 +4,10 @@
 //
 
 using BitFlyerDotNet.LightningApi.Public;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using WebSocket4Net;
 
 namespace BitFlyerDotNet.LightningApi.Realtime
